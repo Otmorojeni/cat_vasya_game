@@ -31,32 +31,43 @@ class Unit(ABC):
 
 
 class Character(Unit):
-    """Класс персонажа"""
+    """Класс персонажа с игровым классом"""
+
+    def __init__(self, strength: float, dexterity: float, constitution: float, wisdom: float,
+                intelligence: float, charisma: float, character_class: str) -> None:
+        
+        super().__init__(strength, dexterity, constitution, wisdom, intelligence, charisma)
+        self.character_class = character_class
+
+        if self.character_class not in ("warrior", "hunter", "mage"):
+            raise ValueError(f"Класс персонажа {character_class} неверный!")
+        
+        self.max_health = self.calculate_max_health()
+        self.damage = self.calculate_damage()
+        self.defense = self.calculate_defense()
 
     def calculate_max_health(self) -> int:
         """Вычисление максимального здоровья персонажа - телосложение * 10 + сила / 2"""
         return int(self.constitution * 10 + (self.strength / 2))
 
     def calculate_damage(self) -> int:
-        """Вычисление базового урона персонажа - сила * 1.5 + ловкость / 4"""
-        return int((self.strength * 1.5) + (self.dexterity / 4))
+        """Вычисление базового урона персонажа в зависимости от класса"""
+        if self.character_class == "warrior":
+            return int(self.strength * 2.2 + self.constitution / 3)
+        elif self.character_class == "mage":
+            return int(self.intelligence * 2.5 + self.wisdom / 2)
+        elif self.character_class == "hunter":
+            return int(self.dexterity * 1.9 + self.strength / 3)
+        else:
+            return 0
 
     def calculate_defense(self) -> int:
-        """Вычисление показателя защиты персонажа - телосложение * 1.5 + ловкость / 3"""
-        return int((self.constitution * 1.5) + (self.dexterity / 3))
-
-
-class Monster(Unit):
-    """Класс монстра"""
-
-    def calculate_max_health(self) -> int:
-        """Вычисление максимального здоровья монстра - телсложение * 8 + сила / 3"""
-        return int((self.constitution * 8) + (self.strength / 3)) 
-
-    def calculate_damage(self) -> int:
-        """Вычисление базового урона монстра - сила * 2 + телосложение / 5"""
-        return int((self.strength * 2) + (self.constitution / 5))
-
-    def calculate_defense(self) -> int:
-        """Вычисление показателя защиты монстра - телосложение * 1.2 + сила / 5"""
-        return int((self.constitution * 1.2) + (self.strength / 5))
+        """Вычисление показателя защиты персонажа в зависимости от класса"""
+        if self.character_class == "warrior":
+            return int(self.constitution * 1.8 + self.strength / 4)
+        elif self.character_class == "mage":
+            return int(self.wisdom * 1.3 + self.intelligence / 6)
+        elif self.character_class == "hunter":
+            return int(self.dexterity * 1.6 + self.constitution / 5)
+        else:
+            return 0
